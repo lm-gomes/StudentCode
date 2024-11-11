@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class PooClass{
+public class Ex1{
 	public double Calculator(double a, double b, int op){
 		switch(op){
 			//Addition
