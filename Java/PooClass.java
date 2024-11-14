@@ -11,8 +11,33 @@ class Livro{
 		this.anoPublicacao = anoPublicacao;
 	}
 
-	void mudarEditora(String novonome){
-		editora = novonome;	
+	void mudarInfo(String novonome, int op){
+		switch(op){
+			case 1:{
+				titulo = novonome;
+				break;
+			}
+			case 2:{
+				autor = novonome;
+				break;	
+			}
+			case 3:{
+				editora = novonome;
+				break;
+			}
+			
+			case 4:{
+				anoPublicacao = Integer.parseInt(novonome);
+				break;
+			}
+			default:{
+				System.out.println("Opcao invalida!");
+			}
+			
+				
+		}
+		
+		
 	}	
 	
 	int calcularIdade(int anoAtual){
@@ -30,10 +55,12 @@ public class PooClass{
 		Livro livro1 = new Livro("A Metamorfose", "Franz Kafka", "Companhia das Letras", 1915);
 		livro1.imprimeInformacoes();
 		System.out.println("");
-		livro1.mudarEditora("Thomas Nelson");
-		livro1.anoPublicacao = 2000;
+		livro1.mudarInfo("1984", 1);
+		livro1.mudarInfo("George Orwell", 2);
+		livro1.mudarInfo("1949", 4);
+		
 		int idadeLivro = livro1.calcularIdade(2024);
-		System.out.print(idadeLivro);
+		
 		livro1.imprimeInformacoes();
 		System.out.printf("\nIdade do livro: %s", idadeLivro);
 			
