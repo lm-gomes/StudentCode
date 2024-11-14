@@ -4,6 +4,13 @@ class Livro{
 	String editora;
 	int anoPublicacao;
 	
+	public Livro(String titulo, String autor, String editora, int anoPublicacao){
+		this.titulo = titulo;
+		this.autor = autor;
+		this.editora = editora;
+		this.anoPublicacao = anoPublicacao;
+	}
+
 	void mudarEditora(String novonome){
 		editora = novonome;	
 	}	
@@ -20,11 +27,9 @@ class Livro{
 
 public class PooClass{
 	public static void main(String args[]){
-		Livro livro1 = new Livro();
-		livro1.titulo = "Reformando o Discipulado";
-		livro1.autor = "Jean Francesco";
-
-
+		Livro livro1 = new Livro("A Metamorfose", "Franz Kafka", "Companhia das Letras", 1915);
+		livro1.imprimeInformacoes();
+		System.out.println("");
 		livro1.mudarEditora("Thomas Nelson");
 		livro1.anoPublicacao = 2000;
 		int idadeLivro = livro1.calcularIdade(2024);
