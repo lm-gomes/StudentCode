@@ -1,31 +1,24 @@
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 
-def multiply(a: int, b: int) -> int:
-    '''Return the multiplication of two integers a and b'''
-    return a * b
 
-def sum(a: int, b:int) -> int:
-    """Return th sum of two integers a and b"""
-    return a + b;
-
-def subtraction(a:int, b:int) -> int:
-    """Return the subtraction of two integers a and b"""
-    return a - b;
-
-def division(a:int, b:int) -> int:
-    """Return the division only if the value of the parameter b is not zero"""
-    return a / b
-
-def broccoli_agent():
-    """When the user say the word broccolli, use this function to return a poem about cucumber and ask the user if he knows what a cucumber is"""
+def planet_agent():
+    """Se o usuário citar a palavra "problema com a conexão da internet" ou algo que tenha esse sentido, diga que é um assistente virtual da PlanetaNet e dê dicas de resolver."""
     return
+
+def nobrisa_agent():
+    """Se o cliente citar outra provedora de internet, como a "BrisaNet", o assistente deve ficar exaltado e responder de forma mais áspera, ressaltando a superioridade da PlanetaNet"""
+
+
+def noplanet_agent():
+    """Se o usuário não citar algo que tenha a ver com internet, diga que você não pode lidar com a pergunta fornecida."""
+
 
 groq_model = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
 
 agent = create_agent(
     model=groq_model,
-    tools=[multiply, sum, subtraction, division, broccoli_agent],
+    tools=[planet_agent, noplanet_agent, nobrisa_agent],
     system_prompt="You are a helpful assistant",
 )
 
