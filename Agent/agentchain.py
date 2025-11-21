@@ -1,33 +1,60 @@
-from langchain.agents import create_agent
+from typing import Literal, TypedDict
+from langgraph.graph import START, MessagesState, StateGraph, END
 from langchain_groq import ChatGroq
 
-
-def planet_agent():
-    """Se o usuário citar a palavra "problema com a conexão da internet" ou algo que tenha esse sentido, diga que é um assistente virtual da PlanetaNet e dê dicas de resolver."""
-    return
-
-def nobrisa_agent():
-    """Se o cliente citar outra provedora de internet, como a "BrisaNet", o assistente deve ficar exaltado e responder de forma mais áspera, ressaltando a superioridade da PlanetaNet"""
+model = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
 
 
-def noplanet_agent():
-    """Se o usuário não citar algo que tenha a ver com internet, diga que você não pode lidar com a pergunta fornecida."""
+class Classification(TypedDict):
+    intent: Literal["criar_arquivo", "nao_arquivo"]
 
 
-groq_model = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
 
-agent = create_agent(
-    model=groq_model,
-    tools=[planet_agent, noplanet_agent, nobrisa_agent],
-    system_prompt="You are a helpful assistant",
-)
+class MyState(TypedDict):
+    classification: Classification
+    user_input: str
+    ai_answer: str
+    pass
+
+structured_model = model.with_structured_output(Classification)
+
+def inputNode(state: MyState) -> MyState:
+    user = input("Digite: ")
+
+    return {"ai_answer": model.invoke(user), "user_input": user}
+
+def router(state: MyState) -> MyState:
+    classification_prompt = f"Mensagem do usuário: {state["user_input"]}\nCaso o usuário tenha digitado que deseja criar um arquivo, sua resposta deve ser 'criar_arquivo', e caso não queira, deve ser 'nao_arquivo' "
+    classification = structured_model.invoke(classification_prompt)
+    print(classification["intent"])
+    return {"classification": classification}
+
+def criar_arquivo(state: MyState):
+    file_name = input("Digite o nome do arquivo: ")
+    classification_prompt = f"Prompt do usuário: {file_name}\nSe o usuário digitar APENAS o nome de arquivo e sua extensão, sua resposta deve ser 'criar_arquivo', e caso não seja, deve ser 'nao_arquivo' "
+    classification = structured_model.invoke(classification_prompt)
+    if(classification["intent"] == "criar_arquivo"):
+        file = open(f"{file_name}", mode="w")
+        print(f"Arquivo {file_name} criado!")
+        text = input("Digite o texto que deseja inserir no arquivo: ")
+        file.write(text)
+    else:
+        print("Especifique o nome e formato do arquivo!\n")
+    
+    return {"classification": classification}
 
 
-user = input("Faca uma pergunta ao agente:")
+graph = StateGraph(MyState)
+graph.add_node("input", inputNode)
+graph.add_node("router", router)
+graph.add_node("criar_arquivo", criar_arquivo)
+
+graph.add_edge(START, "input")
+graph.add_edge("input", "router")
+graph.add_conditional_edges("router", lambda state: state["classification"]["intent"], {"criar_arquivo":"criar_arquivo", "nao_arquivo": END})
+graph.add_conditional_edges("criar_arquivo", lambda state: state["classification"]["intent"], {"criar_arquivo":END, "nao_arquivo":"criar_arquivo"})
 
 
-result = agent.invoke({"messages": [{"role": "user", "content": user}]})
-print("Agente: ", result['messages'][-1].content)
+graph = graph.compile()
 
-
-#for chunk in graph.stream(inputs, stream_mode="updates"):
+graph.invoke({})
